@@ -1,6 +1,8 @@
 class TeamsController < ApplicationController
- before_action :authenticate_user!
+  before_action :authenticate_user!
   before_action :set_team, only: %i[show edit update destroy]
+  before_action :exclude_without_owner, only: %i[edit]
+
 
   def index
     @teams = Team.all
@@ -48,7 +50,7 @@ class TeamsController < ApplicationController
   end
 
   def change_owner
-    if current_user == @working_team.owner
+    if current_user.is_owner?(@working_team)
       @working_team.owner_id = params[:id]
       @working_team.save
       new_owner = @working_team.owner
@@ -68,4 +70,10 @@ class TeamsController < ApplicationController
   def team_params
     params.fetch(:team, {}).permit %i[name icon icon_cache owner_id keep_team_id]
   end
+
+  def exclude_without_owner
+    unless current_user.is_owner?(@team)
+      redirect_back(fallback_location: team_path(@working_team), notice: I18n.t('views.messages.no_authority_without_owner'))
+    end  
+  end  
 end
