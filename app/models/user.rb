@@ -30,8 +30,4 @@ class User < ApplicationRecord
   def is_owner?(team)
     self.id == team.owner_id
   end
-
-  def is_self?(assign)
-    self.id == assign.user_id
-  end  
 end

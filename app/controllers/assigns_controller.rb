@@ -1,5 +1,5 @@
 class AssignsController < ApplicationController
-  before_action :authenticate_user!
+   before_action :authenticate_user!
 
   def create
     team = Team.friendly.find(params[:team_id])
@@ -14,7 +14,7 @@ class AssignsController < ApplicationController
 
   def destroy
     assign = Assign.find(params[:id])
-    if current_user.is_owner?(@working_team) || current_user.is_self?(assign)
+    if current_user == @working_team.owner || current_user == assign.user
       destroy_message = assign_destroy(assign, assign.user)
       redirect_to team_url(params[:team_id]), notice: destroy_message
     end
